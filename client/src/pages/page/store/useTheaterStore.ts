@@ -1,0 +1,4 @@
+type Theater = {
+    theaterid: number,
+    
+};

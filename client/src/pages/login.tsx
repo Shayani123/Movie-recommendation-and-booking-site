@@ -1,0 +1,79 @@
+import {signIn} from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
+import { MdOutlineMail } from "react-icons/md";
+import { FaApple } from "react-icons/fa";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/router";
+
+export default function Login({onClose} : {onClose : () => void}) {
+
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const router = useRouter();
+
+    const handleLogin = async() => {
+        try {
+            const res = await fetch( process.env.NEXT_PUBLIC_API_URL + "/api/auth/login" , {
+                method: "PUT",
+                headers: { "Content-Type" : "application/json" },
+                body: JSON.stringify({email, password}),
+            });
+
+            const data = await res.json();
+            if(!res.ok) throw new Error(data.message);
+            localStorage.setItem("user" , JSON.stringify(data.user));
+            router.push("/");
+
+            //Store token in localstorage
+            localStorage.setItem("token", data.token);
+            alert("Login Successfully");
+            onClose();
+        } catch (err) {
+            alert("Somthing went wrong");
+        }
+    };
+
+    return(
+        <>
+        <div className="absolute inset-0 backdrop-blur-2xl flex items-center justify-center ">
+            <div className=" bg-white p-6 flex justify-between rounded-2xl ">
+                <div>
+                    <h1 className="text-black text-2xl text-center font-semibold">Login</h1>
+                    <h1 className="font-semibold mt-2 ">Email :</h1>
+                    <input type="text" placeholder="Email"  value={email} onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-1 bg-gray-200/50 mt-2 rounded"/>
+                    <h1 className="font-semibold mt-2">Password : </h1>
+                    <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-3 py-1 bg-gray-200/50 mt-2 rounded"/>
+                    <button className="w-full bg-orange-400/60 mt-4 rounded px-3 py-1 text-white font-semibold" 
+                    onClick={handleLogin}>Login</button>
+                    <div className="flex items-center justify-between p-3">
+                        <hr className="w-44 border border-gray-200/60" />
+                        <h1 className="text-gray-400" >OR</h1>
+                        <hr className="w-44 border border-gray-200/60"/>
+                    </div>
+                    <div className="bg-white border border-gray-400/50 w-full flex items-center justify-center rounded">
+                        <FcGoogle className="w-5 h-5 "/>
+                        <button onClick={() => signIn("google")}
+                        className=" p-2 font-semibold"> Continue with Google</button>
+                    </div>
+                    <div className="bg-white border border-gray-400/50 w-full flex items-center justify-center mt-7 rounded">
+                        <MdOutlineMail className="w-5 h-5"/>
+                        <button onClick={() => signIn("google")}
+                        className=" p-2 font-semibold"> Continue with Email</button>
+                    </div>
+                    <div className="bg-white border border-gray-400/50 w-full flex items-center justify-center mt-7 rounded">
+                        <FaApple className="w-5 h-5"/>
+                        <button onClick={() => signIn("google")}
+                        className=" p-2 font-semibold"> Continue with Apple</button>
+                    </div>
+                </div>
+                <div >
+                    <button onClick={() => onClose() } className="right-56 text-xl">X</button>
+                </div>
+            </div>
+        </div>
+        </>
+    );
+}
