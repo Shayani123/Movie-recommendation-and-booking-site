@@ -39,8 +39,8 @@ app.use("/api" , showRoutes);
 app.use("/api" , bookingRoutes);
 app.use("/api" , theaterRoutes);
 app.use("/api", seatRoutes);
-// app.use("/api" , castRoutes);
-app.use("/" , castRoutes);
+app.use("/api" , castRoutes);
+// app.use("/" , castRoutes);
 
 app.get("/", async(req,res) => {
     try {
